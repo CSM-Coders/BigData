@@ -1,0 +1,43 @@
+{
+  "extraido_utc": "2026-11-06T20:35:02+00:00",
+  "filas_sivigila_dengue": 61234,
+  "duplicados_por_llave": 0,
+  "semana_max": 52,
+  "total_casos": 507806,
+  "total_muertes": 487,
+  "codigos_con_casos": 1038,
+  "municipios_dane": 1123,
+  "municipios_divipola": 1122,
+  "solo_en_dane": [
+    "94663"
+  ],
+  "solo_en_divipola": [],
+  "casos_sin_cruce": 1085,
+  "pct_casos_sin_cruce": 0.21,
+  "municipios_clima": 300,
+  "pct_casos_cubiertos_clima": 89.4,
+  "altitud_nula": 0,
+  "prueba_clima": {
+    "municipio": "SANTIAGO DE CALI",
+    "dias": 1157,
+    "nulos_temperatura": 0,
+    "nulos_lluvia": 0
+  },
+  "calendario_epi": [
+    {
+      "ano": 2022,
+      "semana_1": "2022-01-02",
+      "semana_52_termina": "2022-12-31"
+    },
+    {
+      "ano": 2023,
+      "semana_1": "2023-01-01",
+      "semana_52_termina": "2023-12-30"
+    },
+    {
+      "ano": 2024,
+      "semana_1": "2023-12-31",
+      "semana_52_termina": "2024-12-28"
+    }
+  ]
+}

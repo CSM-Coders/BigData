@@ -1,0 +1,19 @@
+# Datos descargados: se regeneran con los scripts
+datos/
+*.xlsx
+*.parquet
+
+# Secretos y credenciales
+.env
+*.pem
+credentials
+.aws/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Sistema
+.DS_Store

@@ -1,13 +1,6 @@
 #!/usr/bin/env python3
-"""Perfila las tres fuentes del caso de estudio de dengue y clima.
-
-Descarga los datos públicos, comprueba que se pueden cruzar y deja en
-`resultados/` los valores de control y la lista de municipios para el clima.
-No usa AWS.
-
-Uso:
-    python punto1-caso-estudio/explorar_fuentes.py [--top 300]
-"""
+# perfila las fuentes de dengue, población y clima, no usa aws
+# uso: python punto1-caso-estudio/explorar_fuentes.py [--top 300]
 import argparse
 import json
 import time
@@ -35,13 +28,13 @@ ANIOS = (2022, 2023, 2024)
 TAM_PAGINA = 50_000
 TAM_LOTE_ELEVACION = 100
 CABECERAS = {"User-Agent": "proyecto-academico-bigdata/1.0"}
-# Open-Meteo cuenta cada coordenada contra su límite por minuto.
+# open-meteo cuenta cada coordenada en su límite por minuto
 ESPERA_LIMITE_S = 65
 MAX_REINTENTOS = 5
 
 
 def get_open_meteo(url: str, params: dict) -> dict:
-    """Consulta Open-Meteo y espera cuando responde 429 por límite de uso."""
+    # si open-meteo responde 429 espera y reintenta
     for _ in range(MAX_REINTENTOS):
         respuesta = requests.get(url, params=params, headers=CABECERAS, timeout=60)
         if respuesta.status_code != 429:
@@ -53,11 +46,7 @@ def get_open_meteo(url: str, params: dict) -> dict:
 
 
 def inicio_semana_epi(anio: int, semana: int) -> date:
-    """Domingo en que empieza una semana epidemiológica.
-
-    La semana 1 es la primera semana de domingo a sábado con al menos cuatro
-    días dentro del año.
-    """
+    # domingo en que empieza la semana, la semana 1 tiene al menos 4 días del año
     primero = date(anio, 1, 1)
     dias_desde_domingo = (primero.weekday() + 1) % 7
     domingo = primero - timedelta(days=dias_desde_domingo)
@@ -67,7 +56,7 @@ def inicio_semana_epi(anio: int, semana: int) -> date:
 
 
 def descargar_sivigila() -> pd.DataFrame:
-    """Baja los eventos de dengue, paginando en un orden estable."""
+    # baja los eventos paginando siempre en el mismo orden
     eventos = ",".join(f"'{e}'" for e in (EVENTO_DENGUE, EVENTO_GRAVE, EVENTO_MUERTE))
     filas, offset = [], 0
     while True:
@@ -92,7 +81,7 @@ def descargar_sivigila() -> pd.DataFrame:
     df = pd.DataFrame(filas)
     for columna in ("cod_eve", "semana", "ano", "conteo"):
         df[columna] = pd.to_numeric(df[columna]).astype(int)
-    # El origen guarda el código como número y pierde el cero inicial.
+    # el código llega sin el cero inicial
     df["cod_mpio"] = df["cod_mun_o"].astype(str).str.zfill(5)
     return df
 
@@ -103,14 +92,14 @@ def descargar_divipola() -> pd.DataFrame:
     )
     respuesta.raise_for_status()
     df = pd.DataFrame(respuesta.json())
-    # DIVIPOLA escribe las coordenadas con coma decimal.
+    # divipola usa coma decimal
     for columna in ("latitud", "longitud"):
         df[columna] = pd.to_numeric(df[columna].str.replace(",", ".", regex=False))
     return df
 
 
 def descargar_poblacion() -> pd.DataFrame:
-    """Devuelve la población total por municipio y año del DANE."""
+    # población total por municipio y año
     archivo = DATOS / "PPED-AreaMun-2018-2042_VP.xlsx"
     if not archivo.exists():
         respuesta = requests.get(URL_DANE, headers=CABECERAS, timeout=180)
@@ -136,7 +125,7 @@ def descargar_poblacion() -> pd.DataFrame:
 
 
 def consultar_elevacion(municipios: pd.DataFrame) -> pd.Series:
-    """Consulta la altitud de cada municipio, en lotes, y la guarda en caché."""
+    # altitud por lotes, se guarda en caché
     cache = DATOS / "elevacion.csv"
     if cache.exists():
         guardada = pd.read_csv(cache, dtype={"cod_mpio": str}).set_index("cod_mpio")
@@ -159,7 +148,7 @@ def consultar_elevacion(municipios: pd.DataFrame) -> pd.Series:
 
 
 def probar_clima(municipio: pd.Series) -> dict:
-    """Pide el rango completo de clima para un municipio y resume la respuesta."""
+    # pide todo el rango de clima de un municipio y lo resume
     diario = get_open_meteo(
         URL_CLIMA,
         {
@@ -187,7 +176,7 @@ def tabla_md(df: pd.DataFrame) -> str:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser = argparse.ArgumentParser(description="perfila las fuentes del caso de estudio")
     parser.add_argument(
         "--top", type=int, default=300, help="municipios con más casos para el clima"
     )
@@ -205,8 +194,7 @@ def main() -> None:
     sivigila.to_csv(DATOS / "sivigila_dengue.csv", index=False)
     divipola.to_csv(DATOS / "divipola.csv", index=False)
 
-    # Casos = dengue + dengue grave. La mortalidad se mide aparte para no
-    # contar dos veces a quien murió y también fue notificado como caso.
+    # casos son 210 y 220, las muertes (580) van aparte para no contar doble
     casos = sivigila[sivigila["cod_eve"].isin((EVENTO_DENGUE, EVENTO_GRAVE))]
 
     por_anio = (
@@ -224,7 +212,7 @@ def main() -> None:
     )
     por_anio["casos"] = por_anio["dengue"] + por_anio["dengue_grave"]
 
-    # Cruce de códigos.
+    # cruce de códigos
     en_dane = set(poblacion["cod_mpio"])
     en_divipola = set(divipola["cod_mpio"])
     casos_mpio = casos.groupby("cod_mpio", as_index=False)["conteo"].sum()
@@ -239,7 +227,7 @@ def main() -> None:
     )
     casos_sin_cruce = int(sin_cruce["conteo"].sum())
 
-    # Incidencia por departamento, para que las consultas de AWS se comparen.
+    # incidencia por departamento, para comparar con aws
     pob_dpto = poblacion.groupby(["cod_dpto", "departamento", "ano"], as_index=False)[
         "poblacion"
     ].sum()
@@ -261,7 +249,7 @@ def main() -> None:
     pico = casos.groupby(["ano", "semana"], as_index=False)["conteo"].sum()
     pico = pico.loc[pico.groupby("ano")["conteo"].idxmax()].rename(columns={"conteo": "casos"})
 
-    # Municipios para el clima y altitud de todos.
+    # top de municipios para clima, altitud para todos
     print("Consultando altitud de todos los municipios...")
     divipola = divipola.assign(elevacion_m=consultar_elevacion(divipola))
     seleccion = (

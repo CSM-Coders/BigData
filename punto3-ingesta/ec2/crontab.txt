@@ -1,0 +1,8 @@
+# ingesta automática al datalake, la ec2 usa hora utc
+PATH=/usr/local/bin:/usr/bin:/bin
+
+# todas las fuentes a las 05:00 utc, medianoche en colombia
+0 5 * * * $HOME/ingesta/ingestar.sh todo >> $HOME/ingesta/logs/ingesta.log 2>&1
+
+# cada hora sigue con lo que falte de open-meteo
+30 * * * * $HOME/ingesta/ingestar.sh api >> $HOME/ingesta/logs/ingesta.log 2>&1

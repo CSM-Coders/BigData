@@ -47,7 +47,7 @@ esac
 
 info "Permitiendo MariaDB solo desde la EC2"
 REGLA_RDS="$(aws ec2 describe-security-groups --group-ids "$ID_RDS" \
-  --query "SecurityGroups[0].IpPermissions[?FromPort==\`3306\`].UserIdGroupPairs[?GroupId=='$ID_EC2'][] | [0].GroupId" \
+  --query "SecurityGroups[0].IpPermissions[?FromPort==\`3306\`].UserIdGroupPairs[] | [?GroupId=='$ID_EC2'] | [0].GroupId" \
   --output text)"
 if ! existe "$REGLA_RDS"; then
   aws ec2 authorize-security-group-ingress --group-id "$ID_RDS" \

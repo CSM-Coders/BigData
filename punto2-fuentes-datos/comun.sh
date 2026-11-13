@@ -79,7 +79,7 @@ rds_host() {
 
 opciones_ssh() {
   printf '%s\n' -i "$LLAVE_SSH" -o StrictHostKeyChecking=accept-new \
-    -o "UserKnownHostsFile=$HOSTS_SSH" -o ConnectTimeout=15
+    -o "UserKnownHostsFile=$HOSTS_SSH" -o ConnectTimeout=15 -o LogLevel=ERROR
 }
 
 ssh_ec2() {

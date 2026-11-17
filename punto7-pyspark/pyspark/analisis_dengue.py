@@ -159,7 +159,7 @@ def p4_clima(b):
     for r in REZAGOS:
         for v in VARIABLES:
             semanas = semanas.withColumn(f"{v}_{r}", F.lag(v, r).over(orden))
-    #una fila por semana y rezago, con el clima de esas semanas antes
+    # una fila por semana y rezago, con el clima de esas semanas antes
     rezagos = F.array(*[
         F.struct(F.lit(r).alias("rezago_semanas"), *[F.col(f"{v}_{r}").alias(v) for v in VARIABLES])
         for r in REZAGOS])
@@ -175,7 +175,7 @@ def p4_clima(b):
                 ["cod_mpio", "ano_epi", "semana_epi"], "left")
           .withColumn("incidencia", F.coalesce("casos", F.lit(0)) * 100000 / F.col("poblacion")))
 
-    #correlacion dentro de cada municipio, sin los que no cambian de incidencia
+    # correlación dentro de cada municipio, sin los que no cambian de incidencia
     por_mpio = (df.groupBy("rezago_semanas", "cod_mpio")
                 .agg(*[F.corr("incidencia", v).alias(v) for v in VARIABLES],
                      F.max("incidencia").alias("maxima"), F.min("incidencia").alias("minima"))

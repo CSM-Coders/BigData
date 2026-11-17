@@ -58,7 +58,7 @@ La API gratuita permite 600 llamadas por minuto, 5.000 por hora y 10.000 por dí
 `openmeteo.py` maneja estos límites así:
 
 - Si se acaba el cupo por minuto, espera 65 segundos y sigue.
-- Si se acaba el cupo por hora o por día, sube lo que lleva y termina. El cron de cada hora sigue desde ahí.
+- Si se acaba el cupo por hora o por día, se sube lo que lleva y se termina cuando tenga mas cupo disponible.
 - Si la red falla, reintenta hasta 5 veces.
 
 ## Requisitos
@@ -66,7 +66,7 @@ La API gratuita permite 600 llamadas por minuto, 5.000 por hora y 10.000 por dí
 - Haber terminado el [Punto 2](../punto2-fuentes-datos/README.md), con la EC2 y la RDS encendidas.
 - Credenciales del lab vigentes en `~/.aws/credentials`.
 
-Si apagaste los recursos, enciéndelos:
+Si se apagaron los recursos hay que volver a encenderlos:
 
 ```bash
 ./punto2-fuentes-datos/encender_apagar.sh iniciar
@@ -74,7 +74,7 @@ Si apagaste los recursos, enciéndelos:
 
 ## Cómo reproducirlo
 
-Ejecuta los scripts desde la raíz del repositorio, en este orden.
+Desde la raiz del repo:
 
 **1. Crear los buckets y las zonas.**
 
@@ -111,23 +111,7 @@ El `cron` de la EC2 queda así, en hora UTC:
 | 05:00 todos los días | `ingestar.sh todo` | Exporta RDS, copia los archivos y pide lo que falte de Open-Meteo |
 | Minuto 30 de cada hora | `ingestar.sh api` | Sigue con Open-Meteo si quedó pendiente |
 
-El `cron` solo corre mientras la EC2 está encendida. Para que el clima avance, deja el lab y la EC2 encendidos, o vuelve a encenderlos al día siguiente si se acabó el cupo diario.
-
-### Comandos útiles en la EC2
-
-Abre una sesión con `./punto2-fuentes-datos/conectar_ec2.sh` y luego:
-
-```bash
-crontab -l
-```
-
-```bash
-tail -f ~/ingesta/logs/ingesta.log
-```
-
-```bash
-~/ingesta/ingestar.sh todo
-```
+El `cron` solo corre mientras la EC2 está encendida. Para que el clima avance, hay que dejar el lab y la EC2 encendidos.
 
 ## Valores esperados
 
@@ -143,18 +127,16 @@ tail -f ~/ingesta/logs/ingesta.log
 
 | Archivo | Dónde corre | Qué hace |
 |---|---|---|
-| `comun.sh` | Tu computador | Nombres de los buckets, reusa `punto2-fuentes-datos/comun.sh` |
-| `00_crear_buckets.sh` | Tu computador | Crea los buckets, bloquea el acceso público y crea las zonas |
-| `01_instalar_ingesta.sh` | Tu computador | Instala la ingesta y el `cron` en la EC2 |
-| `02_ejecutar_ingesta.sh` | Tu computador | Ejecuta la ingesta sin esperar al `cron` |
-| `03_ver_datalake.sh` | Tu computador | Muestra el contenido de `raw` y el avance de Open-Meteo |
+| `comun.sh` |En local | Nombres de los buckets, reusa `punto2-fuentes-datos/comun.sh` |
+| `00_crear_buckets.sh` | En local | Crea los buckets, bloquea el acceso público y crea las zonas |
+| `01_instalar_ingesta.sh` | En local | Instala la ingesta y el `cron` en la EC2 |
+| `02_ejecutar_ingesta.sh` | En local | Ejecuta la ingesta sin esperar al `cron` |
+| `03_ver_datalake.sh` | En local | Muestra el contenido de `raw` y el avance de Open-Meteo |
 | `ec2/ingestar.sh` | EC2 | Exporta RDS y sube los archivos y las respuestas de la API |
 | `ec2/openmeteo.py` | EC2 | Pide altitud y clima, respetando los límites de la API |
 | `ec2/crontab.txt` | EC2 | Programación de la ingesta |
 
 ## Evidencias
-
-Guardar en `evidencias/`:
 
 - `01-crear-buckets.png`: terminal con la salida de `00_crear_buckets.sh`.
 - `02-s3-zonas.png`: consola de S3 con las carpetas `raw/`, `trusted/` y `refined/` del bucket `dengue-datalake-<cuenta>`.

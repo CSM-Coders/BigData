@@ -1,6 +1,6 @@
 # Punto 4: Preparación de datos, de raw a trusted
 
-Este punto limpia y valida los datos de la zona `raw` y los guarda en la zona `trusted`, en formato Parquet. Lo hacen cuatro jobs de AWS Glue escritos en PySpark, que corren sobre Apache Spark 3.5 (Glue 5.0). Un workflow de Glue los lanza en paralelo.
+Limpieza y validación de los datos de la zona `raw` y se guarda en la zona `trusted`, en formato Parquet. Lo hacen cuatro jobs de AWS Glue escritos en PySpark, que corren sobre Apache Spark 3.5 (Glue 5.0). Un workflow de Glue los lanza en paralelo.
 
 ```mermaid
 flowchart LR
@@ -102,7 +102,7 @@ Se guarda particionada por `ano`, el año calendario.
 
 ## Requisitos
 
-- Haber terminado el [Punto 3](../punto3-ingesta/README.md), con la zona `raw` completa.
+- [Punto 3](../punto3-ingesta/README.md), con la zona `raw` completa.
 - Credenciales del lab vigentes en `~/.aws/credentials`.
 - El entorno de Python del Punto 1 con `pyarrow`, para la verificación:
 
@@ -114,13 +114,13 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-La EC2 y la RDS no se necesitan en este punto, así que puedes apagarlas.
+La EC2 y la RDS no se necesitan en este punto.
 
 ## Cómo reproducirlo
 
 Ejecuta los scripts desde la raíz del repositorio, en este orden.
 
-**1. Crear los jobs y el workflow.** Sube el código a `s3://dengue-artefactos-<cuenta>/glue/` y crea los cuatro jobs con el rol `LabRole`.
+**1. Crear los jobs y el workflow.** Subir el código a `s3://dengue-artefactos-<cuenta>/glue/` y crea los cuatro jobs con el rol `LabRole`.
 
 ```bash
 ./punto4-preparacion/00_crear_jobs.sh
@@ -132,7 +132,7 @@ Ejecuta los scripts desde la raíz del repositorio, en este orden.
 ./punto4-preparacion/01_ejecutar_jobs.sh
 ```
 
-**3. Verificar trusted.** Descarga `trusted` a `punto4-preparacion/datos/`, que no se sube a GitHub, y la compara con el Punto 1. Debe terminar en `OK: las 37 revisiones coinciden con el punto 1.`
+**3. Verificar trusted.** Descarga `trusted` a `punto4-preparacion/datos/`, y la compara con el Punto 1. Debe terminar en `OK: las 37 revisiones coinciden con el punto 1.`
 
 ```bash
 ./punto4-preparacion/02_verificar_trusted.sh
@@ -187,8 +187,6 @@ Frente al Punto 1 faltan 1.012 casos y 9 muertes, que son los del exterior.
 | `jobs/trusted_clima.py` | Job de `clima_diario` |
 
 ## Evidencias
-
-Guardar en `evidencias/`:
 
 - `01-crear-jobs.png`: terminal con la salida de `00_crear_jobs.sh`.
 - `02-jobs-consola.png`: consola de Glue, en **ETL jobs**, con los cuatro jobs `dengue-trusted-*`.

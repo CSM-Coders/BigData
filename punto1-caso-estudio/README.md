@@ -38,7 +38,7 @@ Los datos de SIVIGILA se cargarán en MariaDB y los archivos se copiarán a EC2 
 5. **Gravedad:** ¿qué departamentos tienen la mayor proporción de gravedad y la mayor letalidad?
 6. **Altitud:** ¿cómo cambia la incidencia entre rangos de altitud del municipio?
 
-Estas preguntas seran refinadas medida que avance el proyecto.
+Estas preguntas se refinan a medida que avanza el proyecto. Las respuestas están en el [Punto 6](../punto6-consultas-sql/README.md).
 
 ## Resultados del perfilado
 
@@ -105,7 +105,7 @@ pip install -r requirements.txt
 python punto1-caso-estudio/explorar_fuentes.py
 ```
 
-Tarda entre 1 y 3 minutos la primera vez, según las esperas de Open-Meteo. No se necesita una cuenta de AWS. Los datos quedan en `punto1-caso-estudio/datos/`,este no se sube a GitHub, y los resultados en `punto1-caso-estudio/resultados/`.
+Tarda entre 1 y 3 minutos la primera vez, según las esperas de Open-Meteo. No se necesita una cuenta de AWS. Los datos quedan en `punto1-caso-estudio/datos/`, que no se sube a GitHub, y los resultados en `punto1-caso-estudio/resultados/`.
 
 ## Evidencias
 

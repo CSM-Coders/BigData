@@ -1,6 +1,5 @@
 # Proyecto 2 de Big Data: dengue y clima en Colombia
 
-ST0263 Tópicos Especiales en Telemática, Universidad EAFIT.
 
 Datalake en AWS que cruza los casos de dengue notificados en Colombia entre 2022 y 2024 con la población, la altitud y el clima de cada municipio. Responde seis preguntas de negocio sobre dónde y cuándo se concentra la enfermedad, desde la mirada de una secretaría de salud que debe decidir dónde reforzar la prevención.
 

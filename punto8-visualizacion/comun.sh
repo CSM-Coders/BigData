@@ -29,7 +29,7 @@ permitir_puerto() {
   sg="$(sg_id "$SG_EC2")"
   MI_IP="${MI_IP:-$(curl -fsS https://checkip.amazonaws.com | tr -d '[:space:]')/32}"
   actuales="$(aws ec2 describe-security-groups --group-ids "$sg" --output text \
-    --query "SecurityGroups[0].IpPermissions[?FromPort==\`$puerto\`].IpRanges[].CidrIp")"
+    --query "SecurityGroups[0].IpPermissions[?FromPort==\`$puerto\`].IpRanges[].CidrIp" | tr '\t' ' ')"
   case " $actuales " in
     *" $MI_IP "*) echo "El puerto $puerto ya está abierto para $MI_IP" ;;
     *)

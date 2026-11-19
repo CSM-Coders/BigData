@@ -32,7 +32,7 @@ ID_RDS="$(crear_sg "$SG_RDS" "MariaDB solo desde la EC2 de fuentes")"
 MI_IP="$(curl -fsS https://checkip.amazonaws.com | tr -d '[:space:]')/32"
 info "Permitiendo SSH solo desde $MI_IP"
 ACTUALES="$(aws ec2 describe-security-groups --group-ids "$ID_EC2" \
-  --query 'SecurityGroups[0].IpPermissions[?FromPort==`22`].IpRanges[].CidrIp' --output text)"
+  --query 'SecurityGroups[0].IpPermissions[?FromPort==`22`].IpRanges[].CidrIp' --output text | tr '\t' ' ')"
 for cidr in $ACTUALES; do
   if [ "$cidr" != "$MI_IP" ]; then
     aws ec2 revoke-security-group-ingress --group-id "$ID_EC2" \

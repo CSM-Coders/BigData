@@ -10,7 +10,7 @@ read -r SG_MAESTRO DNS < <(aws emr describe-cluster --cluster-id "$ID_EMR" --out
 MI_IP="$(curl -fsS https://checkip.amazonaws.com | tr -d '[:space:]')/32"
 
 ACTUALES="$(aws ec2 describe-security-groups --group-ids "$SG_MAESTRO" \
-  --query 'SecurityGroups[0].IpPermissions[?FromPort==`22`].IpRanges[].CidrIp' --output text)"
+  --query 'SecurityGroups[0].IpPermissions[?FromPort==`22`].IpRanges[].CidrIp' --output text | tr '\t' ' ')"
 case " $ACTUALES " in
   *" $MI_IP "*) ;;
   *)
